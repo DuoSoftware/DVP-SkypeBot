@@ -46,7 +46,21 @@ if (validator.isIP(config.Services.messengerhost))
 //=========================================================
 
 // Setup Restify Server
-var server = restify.createServer();
+
+
+
+var restify = require('restify');
+var fs = require('fs');
+
+
+var https_options = {
+    ca: fs.readFileSync('/etc/ssl/fb/COMODORSADomainValidationSecureServerCA.crt'),
+    key: fs.readFileSync('/etc/ssl/fb/SSL1.txt'),
+    certificate: fs.readFileSync('/etc/ssl/fb/STAR_duoworld_com.crt')
+};
+
+
+var server = restify.createServer(https_options);
 server.listen(process.env.port || process.env.PORT || 3978, function () {
     console.log('%s listening to %s', server.name, server.url);
 });
