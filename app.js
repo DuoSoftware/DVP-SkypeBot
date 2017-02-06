@@ -5,6 +5,7 @@ var config = require('config');
 var validator = require('validator');
 var util = require("util");
 var moment  = require('moment');
+var uuid = require('node-uuid');
 
 
 var sockets = {};
@@ -54,9 +55,9 @@ var fs = require('fs');
 
 
 var https_options = {
-    ca: fs.readFileSync('/etc/ssl/fb/COMODORSADomainValidationSecureServerCA.crt'),
-    key: fs.readFileSync('/etc/ssl/fb/SSL1.txt'),
-    certificate: fs.readFileSync('/etc/ssl/fb/STAR_duoworld_com.crt')
+    //ca: fs.readFileSync('/etc/ssl/fb/COMODORSADomainValidationSecureServerCA.crt'),
+    //key: fs.readFileSync('/etc/ssl/fb/SSL1.txt'),
+    //certificate: fs.readFileSync('/etc/ssl/fb/STAR_duoworld_com.crt')
 };
 
 
@@ -96,7 +97,9 @@ bot.dialog('/', function (session) {
         var socket = require('socket.io-client')(messengerURL, {forceNew: true});
         socket.on('connect', function () {
 
+            var session_id = uuid.v1();
             var jwt = jsonwebtoken.sign({
+                session_id: session_id,
                 iss: config.Host.iss,
                 iat: moment().add(1, 'days').unix(),
                 company: config.Host.company,
@@ -181,7 +184,7 @@ bot.dialog('/', function (session) {
                 })
                 .on('unauthorized', function (msg) {
                     console.log("unauthorized: " + JSON.stringify(msg.data));
-                    throw new Error(msg.data.type);
+                    //throw new Error(msg.data.type);
                 })
 
         });
