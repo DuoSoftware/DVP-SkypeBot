@@ -102,6 +102,7 @@ bot.dialog('/', function (session) {
                 company: config.Host.company,
                 tenant: config.Host.tenant,
                 contact: session.message.address,
+                channel: 'skype',
                 jti: session.message.address.user.id,
                 attributes: ["60"],
                 priority: "0",
