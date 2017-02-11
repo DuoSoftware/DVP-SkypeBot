@@ -95,6 +95,7 @@ bot.dialog('/', function (session) {
 
     if(!sockets[session.message.address.user.id]) {
         var socket = require('socket.io-client')(messengerURL, {forceNew: true});
+        sockets[session.message.address.user.id] = socket;
         socket.on('connect', function () {
 
             var session_id = uuid.v1();
@@ -120,7 +121,6 @@ bot.dialog('/', function (session) {
 
 
                     session.send("Please waiting for human agent to take over");
-                    sockets[session.message.address.user.id] = socket;
 
 
                     function retryAgent () {
@@ -162,6 +162,11 @@ bot.dialog('/', function (session) {
 
                     socket.on('existingagent', function(data){
 
+                        if(retryObj){
+
+                            clearInterval(retryObj);
+                        }
+
                         if(data && data.name && data.avatar) {
                             console.log(data);
                             var card = createAnimationCard(session, data.name, data.avatar);
@@ -179,26 +184,38 @@ bot.dialog('/', function (session) {
                         session.endConversation();
                         socket.disconnect();
 
-                    })
+                    });
+
+                    socket.on('disconnect', function () {
+
+                        delete sockets[session.message.address.user.id];
+                        if(retryObj){
+
+                            clearInterval(retryObj);
+                        }
+
+                    });
 
                 })
                 .on('unauthorized', function (msg) {
                     console.log("unauthorized: " + JSON.stringify(msg.data));
+                    delete sockets[session.message.address.user.id];
                     //throw new Error(msg.data.type);
                 })
 
         });
-        socket.on('disconnect', function () {
 
-        });
     }else{
 
         //session.send("Please waiting for human agent to take over  !!!!!");
 
-        sockets[session.message.address.user.id].emit("message", {
-            message: session.message.text,
-            type:"text" ,
-        });
+        //sockets[session.message.address.user.id].emit("message", {
+        //    message: session.message.text,
+        //    type:"text" ,
+        //});
+
+        console.log("Another user interacted "+session.message.text);
+
     }
 
 });
