@@ -136,6 +136,8 @@ bot.dialog('/', function (session) {
                     var retryObj = setInterval(retryAgent, 30000);
 
 
+                    retryAgent();
+                    
                     socket.on('agent', function(data){
 
                         clearInterval(retryObj);
