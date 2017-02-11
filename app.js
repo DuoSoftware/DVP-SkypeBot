@@ -122,6 +122,11 @@ bot.dialog('/', function (session) {
 
                     session.send("Please waiting for human agent to take over");
 
+                    socket.emit("message", {
+                        message: session.message.text,
+                        type:"text" ,
+                    });
+
 
                     function retryAgent () {
 
@@ -188,6 +193,8 @@ bot.dialog('/', function (session) {
 
                     socket.on('disconnect', function () {
 
+                        session.send("Agent left the chat due to technical issue...");
+                        session.endConversation();
                         delete sockets[session.message.address.user.id];
                         if(retryObj){
 
@@ -209,12 +216,12 @@ bot.dialog('/', function (session) {
 
         //session.send("Please waiting for human agent to take over  !!!!!");
 
-        //sockets[session.message.address.user.id].emit("message", {
-        //    message: session.message.text,
-        //    type:"text" ,
-        //});
+        sockets[session.message.address.user.id].emit("message", {
+            message: session.message.text,
+            type:"text" ,
+        });
 
-        console.log("Another user interacted "+session.message.text);
+        //console.log("Another user interacted "+session.message.text);
 
     }
 
