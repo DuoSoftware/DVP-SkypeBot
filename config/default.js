@@ -18,7 +18,7 @@ module.exports = {
 
     "Services": {
 
-        "messengerhost": "127.0.0.1",//ardsliteservice.app.veery.cloud
+        "messengerhost": "externalipmessagingservice.app.veery.cloud",//ardsliteservice.app.veery.cloud
         "messengerport": "3334",
         "messengerversion": "1.0.0.0"
     }
