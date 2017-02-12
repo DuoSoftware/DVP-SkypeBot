@@ -86,10 +86,12 @@ function createAnimationCard(session, name, avatar) {
 };
 
 
-function createCSATCard(session) {
+function createCSATCard(session, name, avatar) {
     return new builder.ThumbnailCard(session)
         .title('customer satisfaction survey')
+        .subtitle(name)
         .text("Are you satisfied with our service ?")
+        .images([builder.CardImage.create(session, avatar)])
         .buttons([
             builder.CardAction.postBack(session, 'yes', 'Satisfied'),
             builder.CardAction.postBack(session, 'no', 'Not Satisfied')
@@ -161,6 +163,9 @@ bot.dialog('/', function (session) {
                         }
                         console.log(data);
                         var card = createAnimationCard(session,data.name, data.avatar);
+
+                        session.userData.agent = data;
+
                         var msg = new builder.Message(session).addAttachment(card);
                         session.send(msg);
                     });
@@ -205,14 +210,10 @@ bot.dialog('/', function (session) {
                     socket.on('left', function(data){
 
                         session.send("Agent left the chat");
-                        var card = createCSATCard(session);
-                        var msg = new builder.Message(session).addAttachment(card);
-                        session.send(msg);
 
-                        session.beginDialog('/csat');
 
                         if(sockets[session.message.address.user.id]) {
-                            session.endDialog();
+                            session.beginDialog('/csat');
                             delete sockets[session.message.address.user.id];
                         }
                         if(retryObj){
@@ -268,12 +269,19 @@ bot.dialog('/dispatch', function (session) {
     session.endDialog();
 });
 
-bot.dialog('/csat', function (session) {
+bot.dialog('/csat', function (session) {[
 
-    console.log(session.message);
-    session.send("Thank you for your time ---> "+ session.message.text);
-    session.endDialog();
-    session.endConversation();
+    function (session) {
+        var card = createCSATCard(session, session.userData.agent.name, session.userData.agent.avatar);
+        var msg = new builder.Message(session).addAttachment(card);
+        session.send(msg);
+    },
+
+    function (session,result ) {
+        console.log(session.message);
+        session.send("Thank you for your time ---> " + session.message.text);
+        session.endConversation();
+    }]
 
 });
 
