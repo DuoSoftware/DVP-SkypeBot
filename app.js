@@ -6,6 +6,7 @@ var validator = require('validator');
 var util = require("util");
 var moment  = require('moment');
 var uuid = require('node-uuid');
+var request = require('request');
 
 
 var sockets = {};
@@ -55,9 +56,9 @@ var fs = require('fs');
 
 
 var https_options = {
-    ca: fs.readFileSync('/etc/ssl/fb/COMODORSADomainValidationSecureServerCA.crt'),
-    key: fs.readFileSync('/etc/ssl/fb/SSL1.txt'),
-    certificate: fs.readFileSync('/etc/ssl/fb/STAR_duoworld_com.crt')
+    //ca: fs.readFileSync('/etc/ssl/fb/COMODORSADomainValidationSecureServerCA.crt'),
+    //key: fs.readFileSync('/etc/ssl/fb/SSL1.txt'),
+    //certificate: fs.readFileSync('/etc/ssl/fb/STAR_duoworld_com.crt')
 };
 
 
@@ -93,14 +94,75 @@ function createCSATCard(session, name, avatar) {
         .text("Are you satisfied with our service ?")
         .images([builder.CardImage.create(session, avatar)])
         .buttons([
-            builder.CardAction.postBack(session, 'yes', 'Satisfied'),
-            builder.CardAction.postBack(session, 'no', 'Not Satisfied')
+            builder.CardAction.postBack(session, 'good', 'Satisfied'),
+            builder.CardAction.postBack(session, 'bad', 'Not Satisfied')
         ]);
 }
 
 
 
+function CreateSubmission(session, requester, submitter, satisfaction, cb){
 
+    var token = util.format("Bearer %s",config.Host.token);
+    if((config.Services && config.Services.csaturl && config.Services.csatport && config.Services.csatversion)) {
+
+
+        //console.log("CreateSubmission start");
+        var csatURL = util.format("http://%s/DVP/API/%s/CustomerSatisfaction/Submission/ByEngagement", config.Services.csaturl, config.Services.csatversion);
+        if (validator.isIP(config.Services.csaturl))
+            csatURL = util.format("http://%s:%d/DVP/API/%s/CustomerSatisfaction/Submission/ByEngagement", config.Services.csaturl, config.Services.csatport, config.Services.csatversion);
+
+        var csatData =  {
+
+            requester: requester,
+            submitter: submitter,
+            engagement: session,
+            method:'chat',
+            satisfaction: satisfaction
+
+
+        };
+
+
+
+       // logger.debug("Calling CSAT service URL %s", ticketURL);
+       // logger.debug(csatData);
+
+        request({
+            method: "POST",
+            url: csatURL,
+            headers: {
+                authorization: token,
+                companyinfo: util.format("%d:%d", config.Host.tenant, config.Host.company)
+            },
+            json: csatData
+        }, function (_error, _response, datax) {
+
+
+            try {
+
+                if (!_error && _response && _response.statusCode == 200 && _response.body && _response.body.IsSuccess) {
+
+                    cb(true, _response.body.Result);
+
+                }else{
+
+                   // logger.error("There is an error in  create csat for this session "+ session);
+
+                    cb(false, undefined);
+
+
+                }
+            }
+            catch (excep) {
+
+                //logger.error("There is an error in  create csat for this session "+ session, excep);
+                cb(false, undefined);
+
+            }
+        });
+    }
+}
 
 
 
@@ -117,6 +179,7 @@ bot.dialog('/', function (session) {
         socket.on('connect', function () {
 
             var session_id = uuid.v1();
+            session.userData.session_id = session_id;
             var jwt = jsonwebtoken.sign({
                 session_id: session_id,
                 iss: config.Host.iss,
@@ -269,24 +332,36 @@ bot.dialog('/dispatch', function (session) {
     session.endDialog();
 });
 
-bot.dialog('/csat', function (session) {/*[
+bot.dialog('/csat', [
 
-    function (session) {
-        console.log("test");
-        var card = createCSATCard(session, session.userData.agent.name, session.userData.agent.avatar);
-        var msg = new builder.Message(session).addAttachment(card);
-        session.send(msg);
+    function (session, args, next) {
+
+        if(!session.userData.csat) {
+            console.log("test");
+            var card = createCSATCard(session, session.userData.agent.name, session.userData.agent.avatar);
+            var msg = new builder.Message(session).addAttachment(card);
+            session.userData.csat = true;
+            session.send(msg);
+        }else{
+
+            next();
+        }
     },
 
     function (session,result ) {
-        console.log(session.message);
+        session.userData.csat = undefined;
+        console.log(result);
         session.send("Thank you for your time ---> " + session.message.text);
+        CreateSubmission(session.userData.session_id,session.userData.agent.id,session.userData.agent.client,session.message.text,function(){
+
+        })
         session.endConversation();
-    }]*/
+    }]
 
-    console.log(session.message);
-    session.send("Thank you for your time ---> " + session.message.text);
-    session.endConversation();
+    //console.log(session.message);
+    //session.send("Thank you for your time ---> " + session.message.text);
+    //session.endConversation();
+);
 
-});
+
 
