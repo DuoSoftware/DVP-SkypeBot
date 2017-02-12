@@ -83,7 +83,23 @@ function createAnimationCard(session, name, avatar) {
         .subtitle(name)
         .text("Agents greeting can be added !!!!!!!!!!")
         .images([builder.CardImage.create(session, avatar)]);
+};
+
+
+function createCSATCard(session) {
+    return new builder.ThumbnailCard(session)
+        .title('customer satisfaction survey')
+        .text("Are you satisfied with our service ?")
+        .buttons([
+            builder.CardAction.postBack(session, 'yes', 'Satisfied'),
+            builder.CardAction.postBack(session, 'no', 'Not Satisfied')
+        ]);
 }
+
+
+
+
+
 
 
 //=========================================================
@@ -137,15 +153,17 @@ bot.dialog('/', function (session) {
 
 
                     retryAgent();
-                    
+
                     socket.on('agent', function(data){
 
-                        clearInterval(retryObj);
+                        if(retryObj) {
+                            clearInterval(retryObj);
+                        }
                         console.log(data);
                         var card = createAnimationCard(session,data.name, data.avatar);
                         var msg = new builder.Message(session).addAttachment(card);
                         session.send(msg);
-                    })
+                    });
 
 
 
@@ -187,17 +205,32 @@ bot.dialog('/', function (session) {
                     socket.on('left', function(data){
 
                         session.send("Agent left the chat");
-                        delete sockets[session.message.address.user.id];
-                        session.endConversation();
+                        var card = createCSATCard(session);
+                        var msg = new builder.Message(session).addAttachment(card);
+                        session.send(msg);
+
+                        session.beginDialog('/csat');
+
+                        if(sockets[session.message.address.user.id]) {
+                            //session.endConversation();
+                            delete sockets[session.message.address.user.id];
+                        }
+                        if(retryObj){
+
+                            clearInterval(retryObj);
+                        }
                         socket.disconnect();
 
                     });
 
                     socket.on('disconnect', function () {
 
-                        session.send("Agent left the chat due to technical issue...");
-                        session.endConversation();
-                        delete sockets[session.message.address.user.id];
+                        //session.send("Agent left the chat due to technical issue...");
+
+                        if(sockets[session.message.address.user.id]) {
+                            //session.endConversation();
+                            delete sockets[session.message.address.user.id];
+                        }
                         if(retryObj){
 
                             clearInterval(retryObj);
@@ -234,3 +267,13 @@ bot.dialog('/dispatch', function (session) {
     console.log(session.message);
     session.endDialog();
 });
+
+bot.dialog('/csat', function (session) {
+
+    console.log(session.message);
+    session.send("Thank you for your time ---> "+ session.message);
+    //session.endDialog();
+    session.endConversation();
+
+});
+
