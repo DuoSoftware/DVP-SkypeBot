@@ -101,7 +101,7 @@ function createCSATCard(session, name, avatar) {
 
 
 
-function CreateSubmission(session, requester, submitter, satisfaction, cb){
+function CreateSubmission(session, requester, submitter, satisfaction,contact, cb){
 
     var token = util.format("Bearer %s",config.Host.token);
     if((config.Services && config.Services.csaturl && config.Services.csatport && config.Services.csatversion)) {
@@ -118,7 +118,8 @@ function CreateSubmission(session, requester, submitter, satisfaction, cb){
             submitter: submitter,
             engagement: session,
             method:'chat',
-            satisfaction: satisfaction
+            satisfaction: satisfaction,
+            contact: contact
 
 
         };
@@ -352,7 +353,7 @@ bot.dialog('/csat', [
         session.userData.csat = undefined;
         console.log(result);
         session.send("Thank you for your time ---> " + session.message.text);
-        CreateSubmission(session.userData.session_id,session.userData.agent.id,session.userData.agent.client,session.message.text,function(){
+        CreateSubmission(session.userData.session_id,session.userData.agent.id,session.userData.agent.client,session.message.text,session.message.address.user.name,function(){
 
         })
         session.endConversation();
