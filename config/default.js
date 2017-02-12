@@ -25,7 +25,7 @@ module.exports = {
         "messengerversion": "1.0.0.0",
         //externalipmessagingservice.app.veery.cloud
 
-        "csaturl": "127.0.0.1",
+        "csaturl": "csatservice.app.veery.cloud",
         //csatservice.app.veery.cloud
         "csatport": '4445',
         "csatversion": "1.0.0.0"
