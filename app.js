@@ -212,7 +212,7 @@ bot.dialog('/', function (session) {
                         session.beginDialog('/csat');
 
                         if(sockets[session.message.address.user.id]) {
-                            //session.endConversation();
+                            session.endDialog();
                             delete sockets[session.message.address.user.id];
                         }
                         if(retryObj){
@@ -272,7 +272,7 @@ bot.dialog('/csat', function (session) {
 
     console.log(session.message);
     session.send("Thank you for your time ---> "+ session.message.text);
-    //session.endDialog();
+    session.endDialog();
     session.endConversation();
 
 });
