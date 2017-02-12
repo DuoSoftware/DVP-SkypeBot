@@ -271,7 +271,7 @@ bot.dialog('/dispatch', function (session) {
 bot.dialog('/csat', function (session) {
 
     console.log(session.message);
-    session.send("Thank you for your time ---> "+ session.message);
+    session.send("Thank you for your time ---> "+ session.message.text);
     //session.endDialog();
     session.endConversation();
 
