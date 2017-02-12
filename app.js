@@ -269,7 +269,7 @@ bot.dialog('/dispatch', function (session) {
     session.endDialog();
 });
 
-bot.dialog('/csat', function (session) {[
+bot.dialog('/csat', function (session) {/*[
 
     function (session) {
         console.log("test");
@@ -282,7 +282,11 @@ bot.dialog('/csat', function (session) {[
         console.log(session.message);
         session.send("Thank you for your time ---> " + session.message.text);
         session.endConversation();
-    }]
+    }]*/
+
+    console.log(session.message);
+    session.send("Thank you for your time ---> " + session.message.text);
+    session.endConversation();
 
 });
 
