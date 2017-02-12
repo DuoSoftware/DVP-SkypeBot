@@ -272,6 +272,7 @@ bot.dialog('/dispatch', function (session) {
 bot.dialog('/csat', function (session) {[
 
     function (session) {
+        console.log("test");
         var card = createCSATCard(session, session.userData.agent.name, session.userData.agent.avatar);
         var msg = new builder.Message(session).addAttachment(card);
         session.send(msg);
