@@ -6,7 +6,7 @@ module.exports = {
 
     "Host":
     {
-
+		"iss": "COMPANY_NAME"
         "secret": "HOST_SECRET",
         "company": "HOST_COMPANY",
         "tenant": "HOST_TENANT",
@@ -18,9 +18,9 @@ module.exports = {
 
     "Services": {
 
-        "mesengerhost": "HOST_MESSENGER_HOST",//ardsliteservice.app.veery.cloud
-        "messengerport": "HOST_MESSENGER_PORT",
-        "messengerversion": "HOST_MESSENGER_VERSION",
+        "mesengerhost": "SYS_EXT_MESSENGER_HOST",//ardsliteservice.app.veery.cloud
+        "messengerport": "SYS_EXT_MESSENGER_PORT",
+        "messengerversion": "SYS_EXT_MESSENGER_VERSION",
 
         "csaturl": "SYS_CSAT_HOST",
         "csatport": 'SYS_CSAT_PORT',
