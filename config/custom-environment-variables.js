@@ -6,7 +6,7 @@ module.exports = {
 
     "Host":
     {
-		"iss": "COMPANY_NAME"
+		"iss": "COMPANY_NAME",
         "secret": "HOST_SECRET",
         "company": "HOST_COMPANY",
         "tenant": "HOST_TENANT",
