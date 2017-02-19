@@ -142,6 +142,8 @@ function CreateSubmission(session, requester, submitter, satisfaction,contact, c
 
             try {
 
+                console.log(_response.body);
+
                 if (!_error && _response && _response.statusCode == 200 && _response.body && _response.body.IsSuccess) {
 
                     cb(true, _response.body.Result);
