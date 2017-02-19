@@ -181,6 +181,12 @@ bot.dialog('/', function (session) {
 
             var session_id = uuid.v1();
             session.userData.session_id = session_id;
+
+            var channel = "skype";
+            if(session.message.address.channelId){
+                channel = session.message.address.channelId;
+             }
+
             var jwt = jsonwebtoken.sign({
                 session_id: session_id,
                 iss: config.Host.iss,
@@ -188,7 +194,7 @@ bot.dialog('/', function (session) {
                 company: config.Host.company,
                 tenant: config.Host.tenant,
                 contact: session.message.address,
-                channel: 'skype',
+                channel: channel,
                 jti: session.message.address.user.id,
                 attributes: ["60"],
                 priority: "0",
