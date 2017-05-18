@@ -16,6 +16,10 @@ module.exports = {
 
     },
 
+    "Bot":{
+        "appId": "4d973783-5aea-427b-bdf7-28e48fab1e16",
+        "appPassword": "pb8KyMaO7YV0j8omHZ9yfdy"
+    },
 
 
     "Services": {
