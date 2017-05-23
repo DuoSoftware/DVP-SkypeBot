@@ -273,7 +273,8 @@ bot.dialog('/', function (session) {
 
                             try {
                                 var attachment = {
-                                    contentUrl: data.message,
+                                    contentUrl: "http://www.axialis.com/tutorials/sample/logo-ps.png",
+                                    //data.message,
                                     contentType: data.mediaType,
                                     name: data.mediaName
                                 };
