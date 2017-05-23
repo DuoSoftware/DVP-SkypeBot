@@ -99,6 +99,16 @@ function createCSATCard(session, name, avatar) {
         ]);
 }
 
+function createTicketCard(session, subject, reference,type,priority, tags){
+
+    return new builder.ThumbnailCard(session)
+        .title("New ticket has been created")
+        .subtitle(subject)
+        .subtitle(type)
+        .subtitle(priority)
+        .text("Your reference id is "+reference);
+
+}
 
 
 function CreateSubmission(session, requester, submitter, satisfaction,contact, cb){
@@ -259,7 +269,33 @@ bot.dialog('/', function (session) {
 
                     socket.on("message", function(data){
 
-                        session.send(data.message);
+                        if(data.type == 'link' && data.mediaType && data.mediaName){
+
+                            var msg = new builder.Message(session)
+                                .addAttachment({
+                                    contentUrl: data.message,
+                                    contentType: data.mediaType,
+                                    name: data.mediaName
+                                });
+                            session.send(msg);
+
+
+                        }else {
+                            session.send(data.message);
+                        }
+
+
+
+
+
+                    });
+
+                    socket.on("ticket", function(data){
+
+                        console.log(data);
+                        var card = createTicketCard(session,data.subject,data.reference,data.type, data.prority ,data.tags);
+                        var msg = new builder.Message(session).addAttachment(card);
+                        session.send(msg);
                     });
 
                     socket.on('existingagent', function(data){
