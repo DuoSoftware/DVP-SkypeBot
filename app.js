@@ -271,22 +271,22 @@ bot.dialog('/', function (session) {
 
                         if(data.type == 'link' && data.mediaType && data.mediaName){
 
-                            var msg = new builder.Message(session)
-                                .addAttachment({
-                                    contentUrl: data.message,
-                                    contentType: data.mediaType,
-                                    name: data.mediaName
-                                });
-                            session.send(msg);
+                            try {
+                                var msg = new builder.Message(session)
+                                    .addAttachment({
+                                        contentUrl: data.message,
+                                        contentType: data.mediaType,
+                                        name: data.mediaName
+                                    });
+                                session.send(msg);
+                            }catch(ex){
+                                console.log(ex);
+                            }
 
 
                         }else {
                             session.send(data.message);
                         }
-
-
-
-
 
                     });
 
