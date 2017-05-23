@@ -272,12 +272,15 @@ bot.dialog('/', function (session) {
                         if(data.type == 'link' && data.mediaType && data.mediaName){
 
                             try {
+                                var attachment = {
+                                    contentUrl: data.message,
+                                    contentType: data.mediaType,
+                                    name: data.mediaName
+                                };
+
+                                console.log(attachment);
                                 var msg = new builder.Message(session)
-                                    .addAttachment({
-                                        contentUrl: data.message,
-                                        contentType: data.mediaType,
-                                        name: data.mediaName
-                                    });
+                                    .addAttachment(attachment);
 
                                 console.log(data)
                                 session.send(msg);
