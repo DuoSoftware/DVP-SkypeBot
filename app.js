@@ -278,6 +278,8 @@ bot.dialog('/', function (session) {
                                         contentType: data.mediaType,
                                         name: data.mediaName
                                     });
+
+                                console.log(data)
                                 session.send(msg);
                             }catch(ex){
                                 console.log(ex);
