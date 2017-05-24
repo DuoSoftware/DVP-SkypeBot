@@ -392,7 +392,7 @@ bot.dialog('/', function (session) {
 
             console.log(session.message);
             var msg = {
-                message: session.message.text,
+                message: session.message.attachments[0].contentUrl,
                 mediaType:session.message.attachments[0].contentType,
                 //mediaToken:obtainToken(),
                 link:session.message.attachments[0].contentUrl,
