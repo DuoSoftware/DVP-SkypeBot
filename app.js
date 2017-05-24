@@ -390,6 +390,8 @@ bot.dialog('/', function (session) {
             //    console.log('Error downloading attachment:', { statusCode: err.statusCode, message: err.response.statusMessage });
             //});
 
+            console.log(session.message);
+
             sockets[session.message.address.user.id].emit("message", {
                 message: session.message.text,
                 mediaType:session.message.attachments[0].contentType,
