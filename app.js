@@ -393,7 +393,7 @@ bot.dialog('/', function (session) {
             sockets[session.message.address.user.id].emit("message", {
                 message: session.message.text,
                 mediaType:attachment.contentType,
-                mediaToken:checkRequiresToken(msg),
+                //mediaToken:obtainToken(),
                 link:attachment.contentUr,
                 type:"link" ,
             });
@@ -456,19 +456,19 @@ var checkRequiresToken = function (message) {
     return message.source === 'skype' || message.source === 'msteams';
 };
 
-var requestWithToken = function (url) {
-    return obtainToken().then(function (token) {
-        return request({
-            url: url,
-            headers: {
-                'Authorization': 'Bearer ' + token,
-                'Content-Type': 'application/octet-stream'
-            }
-        });
-    });
-};
+//var requestWithToken = function (url) {
+//    return obtainToken().then(function (token) {
+//        return request({
+//            url: url,
+//            headers: {
+//                'Authorization': 'Bearer ' + token,
+//                'Content-Type': 'application/octet-stream'
+//            }
+//        });
+//    });
+//};
 
 // Promise for obtaining JWT Token (requested once)
-var obtainToken = Promise.promisify(connector.getAccessToken.bind(connector));
+//var obtainToken = Promise.promisify(connector.getAccessToken.bind(connector));
 
 
