@@ -392,9 +392,9 @@ bot.dialog('/', function (session) {
 
             sockets[session.message.address.user.id].emit("message", {
                 message: session.message.text,
-                mediaType:attachment.contentType,
+                mediaType:session.message.attachments[0].contentType,
                 //mediaToken:obtainToken(),
-                link:attachment.contentUr,
+                link:session.message.attachments[0].contentUr,
                 type:"link" ,
             });
 
