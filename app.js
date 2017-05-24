@@ -395,8 +395,8 @@ bot.dialog('/', function (session) {
                 message: session.message.text,
                 mediaType:session.message.attachments[0].contentType,
                 //mediaToken:obtainToken(),
-                link:session.message.attachments[0].contentUr,
-                type:"link" ,
+                link:session.message.attachments[0].contentUrl,
+                type:"text" ,
             };
 
             console.log(msg);
