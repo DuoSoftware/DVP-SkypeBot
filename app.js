@@ -391,14 +391,17 @@ bot.dialog('/', function (session) {
             //});
 
             console.log(session.message);
-
-            sockets[session.message.address.user.id].emit("message", {
+            var msg = {
                 message: session.message.text,
                 mediaType:session.message.attachments[0].contentType,
                 //mediaToken:obtainToken(),
                 link:session.message.attachments[0].contentUr,
                 type:"link" ,
-            });
+            };
+
+            console.log(msg);
+
+            sockets[session.message.address.user.id].emit("message", msg);
 
 
         }else{
