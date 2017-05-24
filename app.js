@@ -366,10 +366,47 @@ bot.dialog('/', function (session) {
 
         //session.send("Please waiting for human agent to take over  !!!!!");
 
-        sockets[session.message.address.user.id].emit("message", {
-            message: session.message.text,
-            type:"text" ,
-        });
+
+
+        if (session.message.attachments && session.message.attachments.length > 0) {
+
+
+            //var attachment = msg.attachments[0];
+            //var fileDownload = checkRequiresToken(msg)
+            //    ? requestWithToken(attachment.contentUrl)
+            //    : request(attachment.contentUrl);
+            //
+            //fileDownload.then(
+            //    function (response) {
+            //
+            //        // Send reply with attachment type & size
+            //        var reply = new builder.Message(session)
+            //            .text('Attachment of %s type and size of %s bytes received.', attachment.contentType, response.length);
+            //        session.send(reply);
+            //
+            //
+            //
+            //    }).catch(function (err) {
+            //    console.log('Error downloading attachment:', { statusCode: err.statusCode, message: err.response.statusMessage });
+            //});
+
+            sockets[session.message.address.user.id].emit("message", {
+                message: session.message.text,
+                mediaType:attachment.contentType,
+                mediaToken:checkRequiresToken(msg),
+                link:attachment.contentUr,
+                type:"link" ,
+            });
+
+
+        }else{
+
+            sockets[session.message.address.user.id].emit("message", {
+                message: session.message.text,
+                type:"text" ,
+            });
+        }
+
 
         //console.log("Another user interacted "+session.message.text);
 
@@ -414,5 +451,24 @@ bot.dialog('/csat', [
     //session.endConversation();
 );
 
+
+var checkRequiresToken = function (message) {
+    return message.source === 'skype' || message.source === 'msteams';
+};
+
+var requestWithToken = function (url) {
+    return obtainToken().then(function (token) {
+        return request({
+            url: url,
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/octet-stream'
+            }
+        });
+    });
+};
+
+// Promise for obtaining JWT Token (requested once)
+var obtainToken = Promise.promisify(connector.getAccessToken.bind(connector));
 
 
