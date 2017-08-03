@@ -69,8 +69,8 @@ server.listen(process.env.port || process.env.PORT || 3978, function () {
 
 // Create chat bot
 var connector = new builder.ChatConnector({
-    appId: '4d973783-5aea-427b-bdf7-28e48fab1e16',
-    appPassword: 'pb8KyMaO7YV0j8omHZ9yfdy'
+    appId: config.Bot.appId,
+    appPassword: config.Bot.appPassword
 });
 var bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
@@ -99,6 +99,16 @@ function createCSATCard(session, name, avatar) {
         ]);
 }
 
+function createTicketCard(session, subject, reference,type,priority, tags){
+
+    return new builder.ThumbnailCard(session)
+        .title("New ticket has been created")
+        .subtitle(subject)
+        .subtitle(type)
+        .subtitle(priority)
+        .text("Your reference id is "+reference);
+
+}
 
 
 function CreateSubmission(session, requester, submitter, satisfaction,contact, cb){
@@ -259,7 +269,39 @@ bot.dialog('/', function (session) {
 
                     socket.on("message", function(data){
 
-                        session.send(data.message);
+                        if(data.type == 'link' && data.mediaType && data.mediaName){
+
+                            try {
+                                var attachment = {
+                                    contentUrl: "http://www.axialis.com/tutorials/sample/logo-ps.png",
+                                    //data.message,
+                                    contentType: data.mediaType,
+                                    name: data.mediaName
+                                };
+
+                                console.log(attachment);
+                                var msg = new builder.Message(session)
+                                    .addAttachment(attachment);
+
+                                console.log(data)
+                                session.send(msg);
+                            }catch(ex){
+                                console.log(ex);
+                            }
+
+
+                        }else {
+                            session.send(data.message);
+                        }
+
+                    });
+
+                    socket.on("ticket", function(data){
+
+                        console.log(data);
+                        var card = createTicketCard(session,data.subject,data.reference,data.type, data.prority ,data.tags);
+                        var msg = new builder.Message(session).addAttachment(card);
+                        session.send(msg);
                     });
 
                     socket.on('existingagent', function(data){
@@ -324,10 +366,52 @@ bot.dialog('/', function (session) {
 
         //session.send("Please waiting for human agent to take over  !!!!!");
 
-        sockets[session.message.address.user.id].emit("message", {
-            message: session.message.text,
-            type:"text" ,
-        });
+
+
+        if (session.message.attachments && session.message.attachments.length > 0) {
+
+
+            //var attachment = msg.attachments[0];
+            //var fileDownload = checkRequiresToken(msg)
+            //    ? requestWithToken(attachment.contentUrl)
+            //    : request(attachment.contentUrl);
+            //
+            //fileDownload.then(
+            //    function (response) {
+            //
+            //        // Send reply with attachment type & size
+            //        var reply = new builder.Message(session)
+            //            .text('Attachment of %s type and size of %s bytes received.', attachment.contentType, response.length);
+            //        session.send(reply);
+            //
+            //
+            //
+            //    }).catch(function (err) {
+            //    console.log('Error downloading attachment:', { statusCode: err.statusCode, message: err.response.statusMessage });
+            //});
+
+            console.log(session.message);
+            var msg = {
+                message: session.message.attachments[0].contentUrl,
+                mediaType:session.message.attachments[0].contentType,
+                //mediaToken:obtainToken(),
+                link:session.message.attachments[0].contentUrl,
+                type:"text" ,
+            };
+
+            console.log(msg);
+
+            sockets[session.message.address.user.id].emit("message", msg);
+
+
+        }else{
+
+            sockets[session.message.address.user.id].emit("message", {
+                message: session.message.text,
+                type:"text" ,
+            });
+        }
+
 
         //console.log("Another user interacted "+session.message.text);
 
@@ -372,5 +456,24 @@ bot.dialog('/csat', [
     //session.endConversation();
 );
 
+
+var checkRequiresToken = function (message) {
+    return message.source === 'skype' || message.source === 'msteams';
+};
+
+//var requestWithToken = function (url) {
+//    return obtainToken().then(function (token) {
+//        return request({
+//            url: url,
+//            headers: {
+//                'Authorization': 'Bearer ' + token,
+//                'Content-Type': 'application/octet-stream'
+//            }
+//        });
+//    });
+//};
+
+// Promise for obtaining JWT Token (requested once)
+//var obtainToken = Promise.promisify(connector.getAccessToken.bind(connector));
 
 

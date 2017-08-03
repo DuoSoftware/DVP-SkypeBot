@@ -14,6 +14,11 @@ module.exports = {
 
     },
 
+    "Bot":{
+        "appId": "BOT_APP_ID",
+        "appPassword": "BOT_APP_PASSWORD"
+    },
+
 
 
     "Services": {
